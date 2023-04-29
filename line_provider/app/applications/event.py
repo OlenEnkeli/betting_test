@@ -69,7 +69,7 @@ class EventController:
         session: AsyncSession,
         rabbit_client: aiorabbit.client.Client,
         origin: EventScheme,
-    ) -> Event | None:
+    ) -> EventScheme | None:
         new_event = Event(**origin.dict())
         session.add(new_event)
 
@@ -85,7 +85,7 @@ class EventController:
             event=event,
         )
 
-        return new_event
+        return event
 
     @classmethod
     async def update(
@@ -93,10 +93,10 @@ class EventController:
         session: AsyncSession,
         origin: EventScheme,
         rabbit_client: aiorabbit.client.Client,
-    ) -> Event | None:
+    ) -> EventScheme | None:
         event = await cls._get_by_id(session=session, id=origin.event_id)
         if not event:
-            raise None
+            return None
 
         updated_event = Event(**origin.dict())
         await session.merge(updated_event)
@@ -109,7 +109,7 @@ class EventController:
             event=event,
         )
 
-        return updated_event
+        return event
 
     @classmethod
     async def remove(

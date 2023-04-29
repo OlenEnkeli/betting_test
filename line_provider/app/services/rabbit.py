@@ -14,7 +14,7 @@ async def rabbit_publish(
     if not await client.publish(
         config.RABBIT_EXCHANGE,
         rk,
-        json.dumps(message).encode('utf-8'),
+        json.dumps(message, default=str).encode('utf-8'),
     ):
         return False
 
