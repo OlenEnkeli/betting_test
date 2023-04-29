@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "line-provider"
+version = "0.1.0"
+description = ""
+authors = ["anton <angeloffree@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "line_provider"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.1"
+uvicorn = "^0.22.0"
+coloredlogs = "^15.0.1"
+python-dotenv = "^1.0.0"
+alembic = "^1.10.4"
+asyncpg = "^0.27.0"
+sqlalchemy = "2.0"
+psycopg2-binary = "^2.9.6"
+aiorabbit = "^1.0.0a1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
