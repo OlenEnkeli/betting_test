@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.bet import BetState
 from app.schemas.event import (
     EventScheme,
     ListEventScheme,
@@ -113,12 +114,15 @@ class EventController:
                 session=session,
                 event=updated_event,
             )
-
             for bet in bets:
                 await BetController.close(
                     session=session,
                     bet_id=bet.bet_id,
-                    bet_state=bet.state,
+                    bet_state=(
+                        BetState.WIN
+                        if event.state == EventState.FINISHED_WIN
+                        else BetState.LOSE
+                    ),
                 )
 
         return updated_event

@@ -44,7 +44,7 @@ async def test_main():
         assert json['state'] == 'new'
 
         # Делаем ставку
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         resp = await client.post(
             f'{config.BET_MAKER_API_URL}/bets/',
             json={
@@ -57,9 +57,8 @@ async def test_main():
         assert resp.status_code == 200
         bet_id = json['bet_id']
 
-
         # Ждем, пока событие завершится и его проверяем статус
-        await asyncio.sleep(3)
+        await asyncio.sleep(7)
         resp = await client.get(
             f'{config.LINE_PROVER_API_URL}/events/{test_event_id}'
         )
