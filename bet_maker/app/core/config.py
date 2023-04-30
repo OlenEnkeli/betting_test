@@ -50,11 +50,6 @@ class Config(BaseSettings):
         )
 
 
-    class Config:
-        case_sensitive = True
-        env_file = '.env'
-
-
 config = Config()
 
 LOG_CONFIG = {
