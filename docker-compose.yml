@@ -88,12 +88,12 @@ services:
     command: >
       sh -c "
         sleep 5 &&
-        alembic upgrade head &&
         python3 -m app.line_finisher
       "
     volumes:
       - ./line_provider:/app
     depends_on:
+      - line_provider
       - bet_maker_db
       - rabbitmq
 
@@ -111,7 +111,7 @@ services:
      - PROJECT_VERSION=0.1.0
      - API_STATUS=develop
      - POSTGRES_SERVER=bet_maker_db:5432
-     - POSTGRES_DB=line_provider
+     - POSTGRES_DB=bet_maker
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=password
      - RABBIT_SERVER=rabbitmq:5672
@@ -142,8 +142,7 @@ services:
       dockerfile: Dockerfile
     command: >
       sh -c "
-        sleep 5 &
-        alembic upgrade head &&
+        sleep 5 &&
         python3 -m app.services.bet_processing
       "
     environment:
@@ -155,7 +154,7 @@ services:
      - PROJECT_VERSION=0.1.0
      - API_STATUS=develop
      - POSTGRES_SERVER=bet_maker_db:5432
-     - POSTGRES_DB=line_provider
+     - POSTGRES_DB=bet_maker
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=password
      - RABBIT_SERVER=rabbitmq:5672
@@ -168,5 +167,6 @@ services:
     volumes:
       - ./bet_maker:/app
     depends_on:
+      - bet_maker
       - bet_maker_db
       - rabbitmq
