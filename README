@@ -21,12 +21,13 @@
 ### Запуск тестов
 
 Тесты в проекты представленны  интеграционным тестов через pytest
-Для его запуска необходимо:
+Для его запуска необходимо запустить docker-compose и:
 
 ```
     cd path/to/the/project/integrity_test
     poetry install
     poetry shell
+    cp docker.env .env
     pytest
 ```
 

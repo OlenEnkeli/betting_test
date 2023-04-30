@@ -8,19 +8,15 @@ services:
     environment:
       - POSTGRES_DB=line_provider
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-    ports:
-      - 5432:5433
+      - POSTGRES_PASSWORD=password
 
   bet_maker_db:
     image: postgres:12
-    container_name: line_provider_db
+    container_name: bet_maker_db
     environment:
-      - POSTGRES_DB=line_provider
+      - POSTGRES_DB=bet_maker
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-    ports:
-      - 5432:5434
+      - POSTGRES_PASSWORD=password
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
@@ -31,54 +27,70 @@ services:
     container_name: line_provider_api
     build:
       context: ./line_provider
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        uvicorn --reload app.main:app --port 8000 --timeout-keep-alive 1000
+      "
     environment:
-      - SERVER_NAME=default
-      - SERVER_HOST=http://127.0.0.1:8000
-      - SERVER_TZ=Europe/Moscow
-      - APP_MODE=develop
-      - PROJECT_NAME=line_provider
-      - PROJECT_VERSION=0.1.0
-      - API_STATUS=develop
-      - POSTGRES_SERVER=line_provider_db:5432
-      - POSTGRES_DB=line_provider
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-      - RABBIT_SERVER=rabbitmq:5672
-      - RABBIT_USER=guest
-      - RABBIT_PASSWORD=guest
-      - RABBIT_EXCHANGE=line_provider
-      - NEW_EVENT_RK=new_event_rk
-      - UPDATE_EVENT_RK=update_event_rk
-      - REMOVE_EVENT_RK=remove_event_rk
+      SERVER_NAME: default
+      SERVER_HOST: http://127.0.0.1:8000
+      SERVER_TZ: Europe/Moscow
+      APP_MODE: develop
+      PROJECT_NAME: line_provider
+      PROJECT_VERSION: 0.1.0
+      API_STATUS: develop
+      POSTGRES_SERVER: line_provider_db:5432
+      POSTGRES_DB: line_provider
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      RABBIT_SERVER: rabbitmq:5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: line_provider
+      NEW_EVENT_RK: new_event_rk
+      UPDATE_EVENT_RK: update_event_rk
+      REMOVE_EVENT_RK: remove_event_rk
     depends_on:
       - line_provider_db
       - rabbitmq
+    volumes:
+      - ./line_provider:/app
     ports:
-      - 8000:8010
+      - 8010:8000
   
   line_finisher:
-    container_name: line_provider_api
+    container_name: line_finisher
     build:
       context: ./line_provider
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python3 -m app.line_finisher
+      "
     environment:
-      - SERVER_NAME=default
-      - SERVER_HOST=http://127.0.0.1:8000
-      - SERVER_TZ=Europe/Moscow
-      - APP_MODE=develop
-      - PROJECT_NAME=line_provider
-      - PROJECT_VERSION=0.1.0
-      - API_STATUS=develop
-      - POSTGRES_SERVER=line_provider_db:5432
-      - POSTGRES_DB=line_provider
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-      - RABBIT_SERVER=rabbitmq:5672
-      - RABBIT_USER=guest
-      - RABBIT_PASSWORD=guest
-      - RABBIT_EXCHANGE=line_provider
-      - NEW_EVENT_RK=new_event_rk
-      - UPDATE_EVENT_RK=update_event_rk
-      - REMOVE_EVENT_RK=remove_event_rk
+      SERVER_NAME: default
+      SERVER_HOST: http://127.0.0.1:8000
+      SERVER_TZ: Europe/Moscow
+      APP_MODE: develop
+      PROJECT_NAME: line_provider
+      PROJECT_VERSION: 0.1.0
+      API_STATUS: develop
+      POSTGRES_SERVER: line_provider_db:5432
+      POSTGRES_DB: line_provider
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      RABBIT_SERVER: rabbitmq:5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: line_provider
+      NEW_EVENT_RK: new_event_rk
+      UPDATE_EVENT_RK: update_event_rk
+      REMOVE_EVENT_RK: remove_event_rk
+    volumes:
+      - ./line_provider:/app
     depends_on:
       - bet_maker_db
       - rabbitmq
@@ -87,54 +99,70 @@ services:
     container_name: bet_maker_api
     build:
       context: ./bet_maker
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        uvicorn --reload app.main:app --port 8001 --timeout-keep-alive 1000
+      "
     environment:
-      - SERVER_NAME=default
-      - SERVER_HOST=http://127.0.0.1:8001
-      - SERVER_TZ=Europe/Moscow
-      - APP_MODE=develop
-      - PROJECT_NAME=bet_maker
-      - PROJECT_VERSION=0.1.0
-      - API_STATUS=develop
-      - POSTGRES_SERVER=bet_maker_db:5432
-      - POSTGRES_DB=line_provider
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-      - RABBIT_SERVER=rabbitmq:5672
-      - RABBIT_USER=guest
-      - RABBIT_PASSWORD=guest
-      - RABBIT_EXCHANGE=line_provider
-      - NEW_EVENT_QUEUE=events.new
-      - UPDATE_EVENT_QUEUE=events.update
-      - REMOVE_EVENT_QUEUE=events.remove
+      SERVER_NAME: default
+      SERVER_HOST: http://127.0.0.1:8001
+      SERVER_TZ: Europe/Moscow
+      APP_MODE: develop
+      PROJECT_NAME: bet_maker
+      PROJECT_VERSION: 0.1.0
+      API_STATUS: develop
+      POSTGRES_SERVER: bet_maker_db:5432
+      POSTGRES_DB: line_provider
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      RABBIT_SERVER: rabbitmq:5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: line_provider
+      NEW_EVENT_QUEUE: events.new
+      UPDATE_EVENT_QUEUE: events.update
+      REMOVE_EVENT_QUEUE: events.remove
+    volumes:
+      - ./bet_maker:/app
     depends_on:
       - bet_maker_db
       - rabbitmq
     ports:
-      - 8000:8011
+      - 8011:8001
     
   bet_proccessing:
     container_name: bet_proccessing
     build:
       context: ./bet_maker
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python3 -m app.services.bet_processing
+      "
     environment:
-      - SERVER_NAME=default
-      - SERVER_HOST=http://127.0.0.1:8001
-      - SERVER_TZ=Europe/Moscow
-      - APP_MODE=develop
-      - PROJECT_NAME=bet_maker
-      - PROJECT_VERSION=0.1.0
-      - API_STATUS=develop
-      - POSTGRES_SERVER=bet_maker_db:5432
-      - POSTGRES_DB=line_provider
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
-      - RABBIT_SERVER=rabbitmq:5672
-      - RABBIT_USER=guest
-      - RABBIT_PASSWORD=guest
-      - RABBIT_EXCHANGE=line_provider
-      - NEW_EVENT_QUEUE=events.new
-      - UPDATE_EVENT_QUEUE=events.update
-      - REMOVE_EVENT_QUEUE=events.remove
+      SERVER_NAME: default
+      SERVER_HOST: http://127.0.0.1:8001
+      SERVER_TZ: Europe/Moscow
+      APP_MODE: develop
+      PROJECT_NAME: bet_maker
+      PROJECT_VERSION: 0.1.0
+      API_STATUS: develop
+      POSTGRES_SERVER: bet_maker_db:5432
+      POSTGRES_DB: line_provider
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      RABBIT_SERVER: rabbitmq:5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: line_provider
+      NEW_EVENT_QUEUE: events.new
+      UPDATE_EVENT_QUEUE: events.update
+      REMOVE_EVENT_QUEUE: events.remove
+    volumes:
+      - ./bet_maker:/app
     depends_on:
       - bet_maker_db
       - rabbitmq
