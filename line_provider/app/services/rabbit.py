@@ -12,9 +12,9 @@ async def rabbit_publish(
     message: dict,
 ) -> bool:
     if not await client.publish(
-        config.RABBIT_EXCHANGE,
-        rk,
-        json.dumps(message, default=str).encode('utf-8'),
+        exchange=config.RABBIT_EXCHANGE,
+        routing_key=rk,
+        message_body=json.dumps(message, default=str).encode('utf-8'),
     ):
         return False
 
@@ -49,6 +49,6 @@ async def rabbit_remove_event(
 ) -> bool:
     return await rabbit_publish(
         client=client,
-        rk=config.UPDATE_EVENT_RK,
+        rk=config.REMOVE_EVENT_RK,
         message={'event_id': event_id},
     )

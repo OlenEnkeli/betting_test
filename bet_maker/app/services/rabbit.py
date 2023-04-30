@@ -1,10 +1,13 @@
 import asyncio
 import json
 import logging
+import logging.config
+
+import coloredlogs
 
 from aiorabbit import client, exceptions, message
 
-from app.core.config import config
+from app.core.config import config, LOG_CONFIG
 from app.core.db import async_session
 from app.applications.event import EventController
 
@@ -16,7 +19,6 @@ class RabbitEventConsmer:
         self.shutdown = asyncio.Event()
 
     async def new_event_callback(self, msg: bytes):
-        print('new')
         origin = json.loads(msg.body)
 
         async with async_session() as session:
@@ -25,10 +27,11 @@ class RabbitEventConsmer:
                 origin=origin,
             )
 
+        logging.info(f'Event {origin["event_id"]} was created.')
+
         await self.client.basic_ack(msg.delivery_tag)
 
     async def update_event_callback(self, msg: bytes):
-        print('update')
         origin = json.loads(msg.body)
 
         async with async_session() as session:
@@ -36,6 +39,8 @@ class RabbitEventConsmer:
                 session=session,
                 origin=origin,
             )
+
+        logging.info(f'Event {origin["event_id"]} was updated.')
 
         await self.client.basic_ack(msg.delivery_tag)
 
@@ -47,6 +52,8 @@ class RabbitEventConsmer:
                 session=session,
                 id=origin['event_id'],
             )
+
+        logging.info(f'Event {origin["event_id"]} was removed.')
 
         await self.client.basic_ack(msg.delivery_tag)
 
@@ -95,4 +102,6 @@ async def run_consume():
 
 
 if __name__ == '__main__':
+    coloredlogs.install()
+    logging.config.dictConfig(LOG_CONFIG)
     asyncio.run(run_consume())
