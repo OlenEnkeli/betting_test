@@ -10,6 +10,7 @@ from app.schemas.event import (
     ListEventScheme,
 )
 from app.models.event import Event, EventState
+from app.applications.bet import BetController
 
 
 class EventController:
@@ -107,8 +108,18 @@ class EventController:
         await session.merge(updated_event)
         await session.commit()
 
-        if event.state == EventState.NEW and updated_event.state != EventState.NEW:
-            pass
+        if updated_event.state != EventState.NEW:
+            bets = await BetController.get_all_bets_for_events(
+                session=session,
+                event=updated_event,
+            )
+
+            for bet in bets:
+                await BetController.close(
+                    session=session,
+                    bet_id=bet.bet_id,
+                    bet_state=bet.state,
+                )
 
         return updated_event
 

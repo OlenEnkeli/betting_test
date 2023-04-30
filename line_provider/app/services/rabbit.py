@@ -1,6 +1,7 @@
 import json
 
 import aiorabbit
+import aiorabbit.client
 
 from app.core.config import config
 from app.schemas.event import EventScheme

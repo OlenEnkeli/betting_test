@@ -53,7 +53,7 @@ class EventController:
         session: AsyncSession,
         id: str,
     ) -> EventScheme | None:
-        result = cls._get_by_id(
+        result = await cls._get_by_id(
             session=session,
             id=id,
         )

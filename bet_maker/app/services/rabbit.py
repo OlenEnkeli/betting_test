@@ -3,6 +3,9 @@ import json
 import logging
 import logging.config
 
+from typing import Callable
+
+import aiorabbit.client
 import coloredlogs
 
 from aiorabbit import client, exceptions, message
@@ -29,8 +32,6 @@ class RabbitEventConsmer:
 
         logging.info(f'Event {origin["event_id"]} was created.')
 
-        await self.client.basic_ack(msg.delivery_tag)
-
     async def update_event_callback(self, msg: bytes):
         origin = json.loads(msg.body)
 
@@ -41,8 +42,6 @@ class RabbitEventConsmer:
             )
 
         logging.info(f'Event {origin["event_id"]} was updated.')
-
-        await self.client.basic_ack(msg.delivery_tag)
 
     async def remove_event_callback(self, msg: bytes):
         origin = json.loads(msg.body)
@@ -55,7 +54,15 @@ class RabbitEventConsmer:
 
         logging.info(f'Event {origin["event_id"]} was removed.')
 
-        await self.client.basic_ack(msg.delivery_tag)
+    async def _consume_queue(
+        self,
+        client: aiorabbit.client.Client,
+        queue: str,
+        callback: Callable,
+    ):
+        async for msg in client.consume(queue):
+            await callback(msg)
+            await client.basic_ack(msg.delivery_tag)
 
     async def consume(self):
         try:
@@ -79,16 +86,19 @@ class RabbitEventConsmer:
         logging.info('Start consuming RabbitMQ queues..')
 
         await asyncio.gather(
-            self.client.basic_consume(
-                config.NEW_EVENT_QUEUE,
+            self._consume_queue(
+                client=self.client,
+                queue=config.NEW_EVENT_QUEUE,
                 callback=self.new_event_callback,
             ),
-            self.client.basic_consume(
-                config.UPDATE_EVENT_QUEUE,
+            self._consume_queue(
+                client=self.client,
+                queue=config.UPDATE_EVENT_QUEUE,
                 callback=self.update_event_callback,
             ),
-            self.client.basic_consume(
-                config.REMOVE_EVENT_QUEUE,
+            self._consume_queue(
+                client=self.client,
+                queue=config.REMOVE_EVENT_QUEUE,
                 callback=self.remove_event_callback,
             ),
         )

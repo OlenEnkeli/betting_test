@@ -21,7 +21,7 @@ async def line_finisher() -> None:
 
     async with async_session() as session:
         async with aiorabbit.connect(config.RABBIT_URL) as rabbit_client:
-            rabbit_client.confirm_select()
+            await rabbit_client.confirm_select()
 
             logging.info('Starting line finisher proccessing..')
 

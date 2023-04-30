@@ -1,6 +1,7 @@
 import hashlib
 
 from datetime import datetime as dt
+from typing import List
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -28,6 +29,19 @@ class BetController:
         return BetsListScheme.parse_obj({
             'bets': result.all()
         })
+
+    @classmethod
+    async def get_all_bets_for_events(
+        cls,
+        session: AsyncSession,
+        event: Event,
+    ) -> List[Bet]:
+        query = (
+            select(Bet)
+            .filter(Bet.event_id == event.event_id)
+            .order_by(Bet.created_at)
+        )
+        return await session.scalars(query)
 
     @classmethod
     async def _get_by_id(
@@ -92,7 +106,7 @@ class BetController:
     async def close(
         cls,
         session: AsyncSession,
-        bet_id: int,
+        bet_id: str,
         bet_state: BetState,
     ) -> bool | None:
         bet = await cls._get_by_id(
