@@ -43,7 +43,7 @@
 
 ### Ссылки на API и Swagger
 
-    - **line_provider API:** <http://127.0.0.1:8000>
-    - **line_provider Swagger:** <http://127.0.0.1:8000/docs/>
-    - **bet_maker API:** <http://127.0.0.1:8001>
-    - **bet_maker Swagger:** <http://127.0.0.1:8001/docs/>
+ - **line_provider API:** <http://127.0.0.1:8000>
+ - **line_provider Swagger:** <http://127.0.0.1:8000/docs/>
+ - **bet_maker API:** <http://127.0.0.1:8001>
+ - **bet_maker Swagger:** <http://127.0.0.1:8001/docs/>
