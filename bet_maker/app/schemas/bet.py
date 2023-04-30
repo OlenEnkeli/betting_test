@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+from typing import List
 
 from pydantic import BaseModel
 
@@ -18,6 +19,13 @@ class BetReturnScheme(BetCreateScheme):
     created_at: dt
     state: BetState
     closed_at: dt | None
+
+    class Config:
+        orm_mode = True
+
+
+class BetsListScheme(BaseModel):
+    bets: List[BetReturnScheme]
 
     class Config:
         orm_mode = True

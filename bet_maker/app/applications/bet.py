@@ -12,17 +12,56 @@ from app.models.event import Event, EventState
 from app.models.bet import Bet, BetState
 from app.schemas.bet import (
     BetCreateScheme,
-    BetReturnScheme,
+    BetReturnScheme, BetsListScheme,
 )
 from app.applications.event import EventController
 
 class BetController:
     @classmethod
-    def get_all(
+    async def get_all(
         cls,
         session: AsyncSession,
-    ) -> BetReturnScheme:
-        pass
+    ) -> BetsListScheme:
+        query = (
+            select(Bet)
+            .order_by(Bet.event_id)
+        )
+        result = await session.scalars(query)
+        return BetsListScheme.parse_obj({
+            'bets': result.all()
+        })
+
+    @classmethod
+    async def _get_by_id(
+        cls,
+        session: AsyncSession,
+        id: str,
+    ) -> Bet | None:
+        query = (
+            select(Bet)
+            .filter(Bet.bet_id == id)
+        )
+
+        fetch = await session.execute(query)
+        result = fetch.scalar_one_or_none()
+
+        return result
+
+    @classmethod
+    async def get_by_id(
+        cls,
+        session: AsyncSession,
+        id: str,
+    ) -> BetReturnScheme | None:
+        result = await cls._get_by_id(
+            session=session,
+            id=id,
+        )
+
+        if not result:
+            return None
+
+        return BetReturnScheme.from_orm(result)
 
     @classmethod
     async def create(
@@ -57,10 +96,22 @@ class BetController:
 
         return BetReturnScheme.from_orm(bet)
 
-    def close(
-        self,
+    @classmethod
+    async def close(
+        cls,
         session: AsyncSession,
         bet_id: int,
         bet_state: BetState,
-    ) -> bool:
-        return True
+    ) -> bool | None:
+        bet = await cls._get_by_id(
+            session=session,
+            id=bet_id,
+        )
+
+        if not bet or bet.state != BetState.NEW:
+            return None
+
+        bet.state = bet_state
+
+        await session.merge(bet)
+        await session.commit()
