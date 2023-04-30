@@ -6,7 +6,6 @@ from datetime import datetime as dt
 import logging
 import aiorabbit
 import logging.config
-import coloredlogs
 
 from sqlalchemy import select
 
@@ -52,8 +51,3 @@ async def line_finisher() -> None:
 
                 await asyncio.sleep(1)
 
-
-if __name__ == '__main__':
-    coloredlogs.install()
-    logging.config.dictConfig(LOG_CONFIG)
-    asyncio.run(line_finisher())

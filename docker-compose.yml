@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+
+  line_provider_db:
+    image: postgres:12
+    container_name: line_provider_db
+    environment:
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+    ports:
+      - 5432:5433
+
+  bet_maker_db:
+    image: postgres:12
+    container_name: line_provider_db
+    environment:
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+    ports:
+      - 5432:5434
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    ports:
+      - 15672:15672
+
+  line_provider:
+    container_name: line_provider_api
+    build:
+      context: ./line_provider
+    environment:
+      - SERVER_NAME=default
+      - SERVER_HOST=http://127.0.0.1:8000
+      - SERVER_TZ=Europe/Moscow
+      - APP_MODE=develop
+      - PROJECT_NAME=line_provider
+      - PROJECT_VERSION=0.1.0
+      - API_STATUS=develop
+      - POSTGRES_SERVER=line_provider_db:5432
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - RABBIT_SERVER=rabbitmq:5672
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_EXCHANGE=line_provider
+      - NEW_EVENT_RK=new_event_rk
+      - UPDATE_EVENT_RK=update_event_rk
+      - REMOVE_EVENT_RK=remove_event_rk
+    depends_on:
+      - line_provider_db
+      - rabbitmq
+    ports:
+      - 8000:8010
+  
+  line_finisher:
+    container_name: line_provider_api
+    build:
+      context: ./line_provider
+    environment:
+      - SERVER_NAME=default
+      - SERVER_HOST=http://127.0.0.1:8000
+      - SERVER_TZ=Europe/Moscow
+      - APP_MODE=develop
+      - PROJECT_NAME=line_provider
+      - PROJECT_VERSION=0.1.0
+      - API_STATUS=develop
+      - POSTGRES_SERVER=line_provider_db:5432
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - RABBIT_SERVER=rabbitmq:5672
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_EXCHANGE=line_provider
+      - NEW_EVENT_RK=new_event_rk
+      - UPDATE_EVENT_RK=update_event_rk
+      - REMOVE_EVENT_RK=remove_event_rk
+    depends_on:
+      - bet_maker_db
+      - rabbitmq
+
+  bet_maker:
+    container_name: bet_maker_api
+    build:
+      context: ./bet_maker
+    environment:
+      - SERVER_NAME=default
+      - SERVER_HOST=http://127.0.0.1:8001
+      - SERVER_TZ=Europe/Moscow
+      - APP_MODE=develop
+      - PROJECT_NAME=bet_maker
+      - PROJECT_VERSION=0.1.0
+      - API_STATUS=develop
+      - POSTGRES_SERVER=bet_maker_db:5432
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - RABBIT_SERVER=rabbitmq:5672
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_EXCHANGE=line_provider
+      - NEW_EVENT_QUEUE=events.new
+      - UPDATE_EVENT_QUEUE=events.update
+      - REMOVE_EVENT_QUEUE=events.remove
+    depends_on:
+      - bet_maker_db
+      - rabbitmq
+    ports:
+      - 8000:8011
+    
+  bet_proccessing:
+    container_name: bet_proccessing
+    build:
+      context: ./bet_maker
+    environment:
+      - SERVER_NAME=default
+      - SERVER_HOST=http://127.0.0.1:8001
+      - SERVER_TZ=Europe/Moscow
+      - APP_MODE=develop
+      - PROJECT_NAME=bet_maker
+      - PROJECT_VERSION=0.1.0
+      - API_STATUS=develop
+      - POSTGRES_SERVER=bet_maker_db:5432
+      - POSTGRES_DB=line_provider
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - RABBIT_SERVER=rabbitmq:5672
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_EXCHANGE=line_provider
+      - NEW_EVENT_QUEUE=events.new
+      - UPDATE_EVENT_QUEUE=events.update
+      - REMOVE_EVENT_QUEUE=events.remove
+    depends_on:
+      - bet_maker_db
+      - rabbitmq
