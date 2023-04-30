@@ -107,6 +107,9 @@ class EventController:
         await session.merge(updated_event)
         await session.commit()
 
+        if event.state == EventState.NEW and updated_event.state != EventState.NEW:
+            pass
+
         return updated_event
 
     @classmethod

@@ -1,9 +1,7 @@
-import logging
 import hashlib
 
 from datetime import datetime as dt
 
-from pydantic.error_wrappers import ValidationError
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +12,7 @@ from app.schemas.bet import (
     BetCreateScheme,
     BetReturnScheme, BetsListScheme,
 )
-from app.applications.event import EventController
+
 
 class BetController:
     @classmethod
@@ -67,15 +65,9 @@ class BetController:
     async def create(
         cls,
         session: AsyncSession,
-        origin: BetCreateScheme
+        event: Event,
+        origin: BetCreateScheme,
     ) -> BetReturnScheme:
-        event = await EventController.get_by_id(
-            session=session,
-            id=origin.event_id,
-        )
-
-        if not event or event.state != EventState.NEW:
-            return None
 
         bet_id_raw = f'{event.event_id}.{origin.amount}.{str(dt.now())}'
         bet_id = hashlib.sha256(bet_id_raw.encode('utf-8')).hexdigest()

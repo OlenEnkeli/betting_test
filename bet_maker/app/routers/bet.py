@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.applications.event import EventController
 from app.core.db import get_session
+from app.models.event import EventState
 from app.schemas.bet import (
     BetCreateScheme,
     BetReturnScheme,
@@ -23,15 +25,27 @@ async def create_bet(
     origin: BetCreateScheme,
     session=Depends(get_session),
 ):
+    event = await EventController._get_by_id(
+        session=session,
+        id=origin.event_id,
+    )
+
+    if not event or event.state != EventState.NEW:
+        raise HTTPException(
+            status_code=422,
+            detail='No event or event is closed.',
+        )
+
     bet = await BetController.create(
+        event=event,
         session=session,
         origin=origin,
     )
 
     if not bet:
         raise HTTPException(
-            status_code=422,
-            detail='Can`t create bet for this event.'
+            status_code=400,
+            detail='Can`t create bet.'
         )
 
     return bet
