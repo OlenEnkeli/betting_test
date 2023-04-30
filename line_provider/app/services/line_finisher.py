@@ -11,7 +11,6 @@ import coloredlogs
 from sqlalchemy import select
 
 from app.core.config import LOG_CONFIG, config
-from app.core.rabbit import get_rabbit_client
 from app.schemas.event import EventScheme
 from app.services.rabbit import rabbit_update_event
 from app.models.event import Event, EventState
