@@ -6,6 +6,7 @@ import coloredlogs
 
 from app.core.config import config, LOG_CONFIG
 from app.routers.event import router as event_router
+from app.routers.bet import router as bet_router
 
 
 coloredlogs.install()
@@ -27,3 +28,4 @@ async def healtcheck():
 
 
 app.include_router(event_router)
+app.include_router(bet_router)

@@ -9,7 +9,7 @@ from app.schemas.event import (
     EventScheme,
     ListEventScheme,
 )
-from app.models.event import Event
+from app.models.event import Event, EventState
 
 
 class EventController:
@@ -19,7 +19,11 @@ class EventController:
         cls,
         session: AsyncSession,
     ) -> ListEventScheme:
-        query = select(Event).order_by(Event.event_id)
+        query = (
+            select(Event)
+            .filter(Event.state == EventState.NEW)
+            .order_by(Event.event_id)
+        )
         result = await session.scalars(query)
         return ListEventScheme.parse_obj({
             'events': result.all()
@@ -47,7 +51,7 @@ class EventController:
         session: AsyncSession,
         id: str,
     ) -> EventScheme | None:
-        result = cls._get_by_id(
+        result = await cls._get_by_id(
             session=session,
             id=id,
         )
