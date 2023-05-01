@@ -55,7 +55,7 @@ services:
       sh -c "
         sleep 5 &&
         alembic upgrade head &&
-        uvicorn --reload app.main:app --port 8000 --timeout-keep-alive 1000 --log-level trace
+        uvicorn --reload app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 1000 --log-level trace
       "
     depends_on:
       - line_provider_db
@@ -129,7 +129,7 @@ services:
       sh -c "
         sleep 5 &&
         alembic upgrade head &&
-        uvicorn --reload app.main:app --port 8001 --timeout-keep-alive 1000
+        uvicorn --reload app.main:app --host 0.0.0.0  --port 8001 --timeout-keep-alive 1000
       "
     volumes:
       - ./bet_maker:/app
