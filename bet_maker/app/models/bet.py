@@ -25,6 +25,6 @@ class Bet(Base):
     bet_id = Column(String, primary_key=True, index=True)
     event_id = Column(String, ForeignKey("event.event_id"), index=True)
     amount = Column(Float)
-    created_at = Column(DateTime, default=dt.now)
+    created_at = Column(DateTime, default=dt.utcnow)
     closed_at = Column(DateTime, nullable=True)
     state = Column(saEnum(BetState), default=BetState.NEW)

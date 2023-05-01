@@ -33,7 +33,7 @@ async def test_main():
             json={
                 'event_id': test_event_id,
                 'coefficient': test_event_coefficient,
-                'deadline': str(dt.now() + td(seconds=5)),
+                'deadline': str(dt.utcnow() + td(seconds=5)),
                 'state': 'new',
             }
         )
@@ -57,8 +57,16 @@ async def test_main():
         assert resp.status_code == 200
         bet_id = json['bet_id']
 
+        # Проверяем, что событие появилось в сервисе bet_maker
+        resp = await client.get(
+            f'{config.BET_MAKER_API_URL}/events/{test_event_id}'
+        )
+
+        json = resp.json()
+        assert resp.status_code == 200
+
         # Ждем, пока событие завершится и его проверяем статус
-        await asyncio.sleep(7)
+        await asyncio.sleep(10)
         resp = await client.get(
             f'{config.LINE_PROVER_API_URL}/events/{test_event_id}'
         )

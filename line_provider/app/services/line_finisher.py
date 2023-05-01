@@ -28,7 +28,7 @@ async def line_finisher() -> None:
                 query = (
                     select(Event)
                     .filter(Event.state == EventState.NEW)
-                    .filter(Event.deadline < dt.now())
+                    .filter(Event.deadline < dt.utcnow())
                     .order_by(Event.deadline)
                 )
                 fetch = await session.scalars(query)

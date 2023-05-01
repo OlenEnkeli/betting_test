@@ -83,7 +83,7 @@ class BetController:
         origin: BetCreateScheme,
     ) -> BetReturnScheme:
 
-        bet_id_raw = f'{event.event_id}.{origin.amount}.{str(dt.now())}'
+        bet_id_raw = f'{event.event_id}.{origin.amount}.{str(dt.utcnow())}'
         bet_id = hashlib.sha256(bet_id_raw.encode('utf-8')).hexdigest()
 
         bet = Bet(
