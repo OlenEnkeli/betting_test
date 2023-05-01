@@ -1,0 +1,79 @@
+{
+"queues": [
+    {
+        "name": "events.new",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+    },
+    {
+        "name": "events.update",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+    },
+    {
+        "name": "events.remove",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+    }
+],
+"exchanges": [
+    {
+        "name": "line_provider",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+    }
+],
+"bindings": [
+    {
+        "source": "line_provider",
+        "vhost": "/",
+        "destination": "events.new",
+        "destination_type": "queue",
+        "routing_key": "new_event_rk",
+    },
+    {
+        "source": "line_provider",
+        "vhost": "/",
+        "destination": "events.update",
+        "destination_type": "queue",
+        "routing_key": "update_event_rk",
+    },
+    {
+        "source": "line_provider",
+        "vhost": "/",
+        "destination": "events.remove",
+        "destination_type": "queue",
+        "routing_key": "remove_event_rk",
+    }
+  ],
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "9/OrQX3yJAJSpoSdN4H+RMCKe2s+Smf+hCaNnM9sUUCStULm",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ]
+ }

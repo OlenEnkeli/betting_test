@@ -19,9 +19,13 @@ services:
       - POSTGRES_PASSWORD=password
 
   rabbitmq:
-    image: rabbitmq:3.10.7-management
+    image: rabbitmq:3.10.7-management-alpine
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq_routing.json:/etc/rabbitmq/definitions.json:ro
     ports:
-      - 15672:15672
+      - 5673:5672
+      - 15673:15672
 
   line_provider:
     container_name: line_provider_api
