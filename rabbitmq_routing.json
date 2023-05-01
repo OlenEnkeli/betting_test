@@ -4,19 +4,19 @@
         "name": "events.new",
         "vhost": "/",
         "durable": true,
-        "auto_delete": false,
+        "auto_delete": false
     },
     {
         "name": "events.update",
         "vhost": "/",
         "durable": true,
-        "auto_delete": false,
+        "auto_delete": false
     },
     {
         "name": "events.remove",
         "vhost": "/",
         "durable": true,
-        "auto_delete": false,
+        "auto_delete": false
     }
 ],
 "exchanges": [
@@ -25,7 +25,7 @@
         "vhost": "/",
         "type": "direct",
         "durable": true,
-        "auto_delete": false,
+        "auto_delete": false
     }
 ],
 "bindings": [
@@ -34,21 +34,21 @@
         "vhost": "/",
         "destination": "events.new",
         "destination_type": "queue",
-        "routing_key": "new_event_rk",
+        "routing_key": "new_event_rk"
     },
     {
         "source": "line_provider",
         "vhost": "/",
         "destination": "events.update",
         "destination_type": "queue",
-        "routing_key": "update_event_rk",
+        "routing_key": "update_event_rk"
     },
     {
         "source": "line_provider",
         "vhost": "/",
         "destination": "events.remove",
         "destination_type": "queue",
-        "routing_key": "remove_event_rk",
+        "routing_key": "remove_event_rk"
     }
   ],
   "users": [
