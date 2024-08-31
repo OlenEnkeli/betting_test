@@ -1,12 +1,8 @@
 from enum import Enum
 
-from sqlalchemy import (
-    Column,
-    String,
-    Float,
-    Enum as saEnum,
-    DateTime,
-)
+from sqlalchemy import Column, DateTime
+from sqlalchemy import Enum as saEnum
+from sqlalchemy import Float, String
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -25,4 +21,4 @@ class Event(Base):
     coefficient = Column(Float)
     deadline = Column(DateTime)
     state = Column(saEnum(EventState), default=EventState.NEW)
-    bets = relationship("Bet")
+    bets = relationship('Bet')

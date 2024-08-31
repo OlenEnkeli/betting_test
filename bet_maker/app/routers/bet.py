@@ -1,15 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 
+from app.applications.bet import BetController
 from app.applications.event import EventController
 from app.core.db import get_session
 from app.models.event import EventState
 from app.schemas.bet import (
-    BetCreateScheme,
-    BetReturnScheme,
-    BetsListScheme,
+    BetCreateSchema,
+    BetReturnSchema,
+    BetsListSchema,
 )
-from app.applications.bet import BetController
-
 
 router = APIRouter(
     prefix='/bets',
@@ -19,10 +22,10 @@ router = APIRouter(
 
 @router.post(
     '/',
-    response_model=BetReturnScheme,
+    response_model=BetReturnSchema,
 )
 async def create_bet(
-    origin: BetCreateScheme,
+    origin: BetCreateSchema,
     session=Depends(get_session),
 ):
     event = await EventController._get_by_id(
@@ -45,7 +48,7 @@ async def create_bet(
     if not bet:
         raise HTTPException(
             status_code=400,
-            detail='Can`t create bet.'
+            detail='Can`t create bet.',
         )
 
     return bet
@@ -53,7 +56,7 @@ async def create_bet(
 
 @router.get(
     '/{bet_id}',
-    response_model=BetReturnScheme,
+    response_model=BetReturnSchema,
 )
 async def get_bet_by_id(
     bet_id: str,
@@ -75,7 +78,7 @@ async def get_bet_by_id(
 
 @router.get(
     '/',
-    response_model=BetsListScheme,
+    response_model=BetsListSchema,
 )
 async def get_events(
     session=Depends(get_session),

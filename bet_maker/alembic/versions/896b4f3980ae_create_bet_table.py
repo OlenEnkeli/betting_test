@@ -1,4 +1,5 @@
-"""create bet table
+"""
+create bet table
 
 Revision ID: 896b4f3980ae
 Revises: 50cf60cbffe3
@@ -8,9 +9,9 @@ Create Date: 2023-04-30 18:07:57.616547
 from datetime import datetime as dt
 from enum import Enum
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '896b4f3980ae'
@@ -29,7 +30,7 @@ def upgrade() -> None:
     op.create_table(
         'bet',
         sa.Column('bet_id', sa.String, primary_key=True, index=True),
-        sa.Column('event_id', sa.String, sa.ForeignKey("event.event_id"), index=True),
+        sa.Column('event_id', sa.String, sa.ForeignKey('event.event_id'), index=True),
         sa.Column('amount', sa.Float),
         sa.Column('created_at', sa.DateTime, default=dt.now),
         sa.Column('closed_at', sa.DateTime, nullable=True),

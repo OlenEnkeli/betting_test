@@ -1,4 +1,5 @@
-"""create event table
+"""
+create event table
 
 Revision ID: 50cf60cbffe3
 Revises: 
@@ -7,9 +8,9 @@ Create Date: 2023-04-28 22:07:04.321118
 """
 from enum import Enum
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '50cf60cbffe3'

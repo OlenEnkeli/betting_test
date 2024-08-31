@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
-
-from app.core.db import get_session
-from app.schemas.event import (
-    EventScheme,
-    ListEventScheme,
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
 )
-from app.applications.event import EventController
 
+from app.applications.event import EventController
+from app.core.db import get_session
+from app.schemas.event import EventSchema, ListEventSchema
 
 router = APIRouter(
     prefix='/events',
@@ -16,7 +16,7 @@ router = APIRouter(
 
 @router.get(
     '/',
-    response_model=ListEventScheme,
+    response_model=ListEventSchema,
 )
 async def get_events(
     session=Depends(get_session),
@@ -26,7 +26,7 @@ async def get_events(
 
 @router.get(
     '/{event_id}',
-    response_model=EventScheme,
+    response_model=EventSchema,
 )
 async def get_event_by_id(
     event_id: str,
@@ -48,21 +48,21 @@ async def get_event_by_id(
 
 @router.post(
     '/',
-    response_model=EventScheme,
+    response_model=EventSchema,
 )
 async def create_event(
-    origin: EventScheme,
+    origin: EventSchema,
     session=Depends(get_session),
 ):
     event = await EventController.create(
         session=session,
-        origin=origin,
+        origin=origin,  # type:ignore[arg-type]
     )
 
     if not event:
         raise HTTPException(
             status_code=422,
-            detail='Duplicate event_id'
+            detail='Duplicate event_id',
         )
 
     return event
@@ -70,10 +70,10 @@ async def create_event(
 
 @router.patch(
     '/',
-    response_model=EventScheme,
+    response_model=EventSchema,
 )
 async def update_event(
-    origin: EventScheme,
+    origin: EventSchema,
     session=Depends(get_session),
 ):
     event = await EventController.update(
@@ -84,7 +84,7 @@ async def update_event(
     if not event:
         raise HTTPException(
             status_code=404,
-            detail='Event not found'
+            detail='Event not found',
         )
 
     return event
@@ -103,7 +103,7 @@ async def remove_event(
     if not removed:
         raise HTTPException(
             status_code=404,
-            detail='Event not found'
+            detail='Event not found',
         )
 
     return {'success': 'ok'}

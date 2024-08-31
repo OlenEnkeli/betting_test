@@ -5,13 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.bet import BetState
-from app.schemas.event import (
-    EventScheme,
-    ListEventScheme,
-)
-from app.models.event import Event, EventState
 from app.applications.bet import BetController
+from app.models.bet import BetState
+from app.models.event import Event, EventState
+from app.schemas.event import EventScheme, ListEventScheme
 
 
 class EventController:
@@ -28,7 +25,7 @@ class EventController:
         )
         result = await session.scalars(query)
         return ListEventScheme.parse_obj({
-            'events': result.all()
+            'events': result.all(),
         })
 
     @classmethod
@@ -70,7 +67,7 @@ class EventController:
         try:
             parsed = EventScheme.parse_obj(origin)
         except ValidationError as e:
-            logging.error(f'Can`t parse event object - {e}. Skipping.')
+            logging.exception(f'Can`t parse event object - {e}. Skipping.')
             return None
 
         return parsed

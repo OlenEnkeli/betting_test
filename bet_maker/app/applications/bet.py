@@ -1,5 +1,4 @@
 import hashlib
-
 from datetime import datetime as dt
 from typing import List
 
@@ -7,11 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.event import Event, EventState
 from app.models.bet import Bet, BetState
+from app.models.event import Event
 from app.schemas.bet import (
     BetCreateScheme,
-    BetReturnScheme, BetsListScheme,
+    BetReturnScheme,
+    BetsListScheme,
 )
 
 
@@ -27,7 +27,7 @@ class BetController:
         )
         result = await session.scalars(query)
         return BetsListScheme.parse_obj({
-            'bets': result.all()
+            'bets': result.all(),
         })
 
     @classmethod
@@ -83,7 +83,7 @@ class BetController:
         origin: BetCreateScheme,
     ) -> BetReturnScheme:
 
-        bet_id_raw = f'{event.event_id}.{origin.amount}.{str(dt.utcnow())}'
+        bet_id_raw = f'{event.event_id}.{origin.amount}.{dt.utcnow()!s}'
         bet_id = hashlib.sha256(bet_id_raw.encode('utf-8')).hexdigest()
 
         bet = Bet(

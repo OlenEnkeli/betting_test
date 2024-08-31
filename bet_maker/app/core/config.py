@@ -58,16 +58,16 @@ LOG_CONFIG = {
     'formatters': {
         'colored': {
             '()': 'coloredlogs.ColoredFormatter',
-            'format': '%(asctime)s (%(levelname)s) %(name)s %(message)s'
+            'format': '%(asctime)s (%(levelname)s) %(name)s %(message)s',
         },
-        'default': {'format': '%(asctime)s [%(process)s] %(levelname)s: %(message)s'}
+        'default': {'format': '%(asctime)s [%(process)s] %(levelname)s: %(message)s'},
     },
     'handlers': {
         'console': {
             'formatter': 'colored',
             'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stdout'
-        }
+            'stream': 'ext://sys.stdout',
+        },
     },
     'root': {'handlers': ['console']},
     'loggers': {
@@ -77,5 +77,5 @@ LOG_CONFIG = {
         'uvicorn': {'propagate': True},
         'uvicorn.access': {'propagate': True},
         'uvicorn.error': {'propagate': True},
-    }
+    },
 }

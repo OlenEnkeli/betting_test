@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from app.models.bet import BetState
 
 
-class BetCreateScheme(BaseModel):
+class BetCreateSchema(BaseModel):
     event_id: str
     amount: float
 
@@ -14,7 +14,7 @@ class BetCreateScheme(BaseModel):
         orm_mode = True
 
 
-class BetReturnScheme(BetCreateScheme):
+class BetReturnSchema(BetCreateSchema):
     bet_id: str
     created_at: dt
     state: BetState
@@ -24,8 +24,8 @@ class BetReturnScheme(BetCreateScheme):
         orm_mode = True
 
 
-class BetsListScheme(BaseModel):
-    bets: List[BetReturnScheme]
+class BetsListSchema(BaseModel):
+    bets: List[BetReturnSchema]
 
     class Config:
         orm_mode = True

@@ -1,13 +1,12 @@
-from enum import Enum
 from datetime import datetime as dt
+from enum import Enum
 
+from sqlalchemy import Column, DateTime
+from sqlalchemy import Enum as saEnum
 from sqlalchemy import (
-    Column,
-    String,
-    ForeignKey,
     Float,
-    DateTime,
-    Enum as saEnum,
+    ForeignKey,
+    String,
 )
 
 from app.core.db import Base
@@ -23,7 +22,7 @@ class Bet(Base):
     __tablename__ = 'bet'
 
     bet_id = Column(String, primary_key=True, index=True)
-    event_id = Column(String, ForeignKey("event.event_id"), index=True)
+    event_id = Column(String, ForeignKey('event.event_id'), index=True)
     amount = Column(Float)
     created_at = Column(DateTime, default=dt.utcnow)
     closed_at = Column(DateTime, nullable=True)

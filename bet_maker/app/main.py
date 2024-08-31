@@ -1,13 +1,11 @@
 import logging.config
 
+import coloredlogs
 from fastapi import FastAPI
 
-import coloredlogs
-
-from app.core.config import config, LOG_CONFIG
-from app.routers.event import router as event_router
+from app.core.config import LOG_CONFIG, config
 from app.routers.bet import router as bet_router
-
+from app.routers.event import router as event_router
 
 coloredlogs.install()
 logging.config.dictConfig(LOG_CONFIG)

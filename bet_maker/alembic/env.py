@@ -1,10 +1,7 @@
 from sqlalchemy import create_engine
-from sqlalchemy import pool
 
 from alembic import context
-
 from app.core.config import config
-
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -19,7 +16,8 @@ target_metadata = None
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
+    """
+    Run migrations in 'offline' mode.
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
@@ -34,7 +32,7 @@ def run_migrations_offline() -> None:
         url=config.POSTGRES_URL,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -42,14 +40,15 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    """
+    Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
     engine = create_engine(
-        config.POSTGRES_URL
+        config.POSTGRES_URL,
     )
 
     with engine.connect() as connection:

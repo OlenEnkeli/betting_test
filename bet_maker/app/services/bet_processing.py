@@ -2,27 +2,25 @@ import asyncio
 import json
 import logging
 import logging.config
-
 from typing import Callable
 
 import aiorabbit.client
 import coloredlogs
+from aiorabbit import client, exceptions
 
-from aiorabbit import client, exceptions, message
-
-from app.core.config import config, LOG_CONFIG
-from app.core.db import async_session
 from app.applications.event import EventController
+from app.core.config import LOG_CONFIG, config
+from app.core.db import async_session
 
 
 class RabbitEventConsmer:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = client.Client(config.RABBIT_URL)
         self.shutdown = asyncio.Event()
 
-    async def new_event_callback(self, msg: bytes):
-        origin = json.loads(msg.body)
+    async def new_event_callback(self, msg: bytes) -> None:
+        origin = json.loads(msg.body) # type:ignore[attr-defined]
 
         async with async_session() as session:
             await EventController.create(
@@ -32,8 +30,8 @@ class RabbitEventConsmer:
 
         logging.info(f'Event {origin["event_id"]} was created.')
 
-    async def update_event_callback(self, msg: bytes):
-        origin = json.loads(msg.body)
+    async def update_event_callback(self, msg: bytes) -> None:
+        origin = json.loads(msg.body) # type:ignore[attr-defined]
 
         async with async_session() as session:
             await EventController.update(
@@ -43,8 +41,8 @@ class RabbitEventConsmer:
 
         logging.info(f'Event {origin["event_id"]} was updated.')
 
-    async def remove_event_callback(self, msg: bytes):
-        origin = json.loads(msg.body)
+    async def remove_event_callback(self, msg: bytes) -> None:
+        origin = json.loads(msg.body)  # type:ignore[attr-defined]
 
         async with async_session() as session:
             await EventController.remove(
@@ -59,16 +57,16 @@ class RabbitEventConsmer:
         client: aiorabbit.client.Client,
         queue: str,
         callback: Callable,
-    ):
+    ) -> None:
         async for msg in client.consume(queue):
             await callback(msg)
             await client.basic_ack(msg.delivery_tag)
 
-    async def consume(self):
+    async def consume(self) -> None:
         try:
             await self.client.connect()
         except exceptions.AccessRefused as e:
-            logging.error(f'Failed to connect to RabbitMQ: {e}')
+            logging.exception(f'Failed to connect to RabbitMQ: {e}')
             return
         await self.client.queue_declare(
             config.NEW_EVENT_QUEUE,
@@ -106,8 +104,7 @@ class RabbitEventConsmer:
         await self.shutdown.wait()
 
 
-
-async def run_consume():
+async def run_consume() -> None:
     await RabbitEventConsmer().consume()
 
 
